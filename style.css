@@ -1,0 +1,132 @@
+:root{
+  --ink:#0e2a3b;      /* midnight lagoon */
+  --ink-2:#163a50;
+  --paper:#f3e9d2;    /* rice paper */
+  --gold:#e9c46a;
+  --brass:#b98a3e;
+  --coral:#e2574c;
+  --jade:#2e9c7f;
+  --muted:#9db8c6;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  min-height:100vh;
+  font-family:"Nunito Sans",system-ui,sans-serif;
+  color:var(--paper);
+  background:
+    radial-gradient(1200px 500px at 80% -10%, #1f5a73 0%, transparent 60%),
+    linear-gradient(180deg,var(--ink) 0%, #0a1d2a 100%);
+  overflow-x:hidden;
+}
+/* moon reflected in water: the one memorable background element */
+.moon{
+  position:fixed; top:6vh; right:8vw; width:110px; height:110px; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #fff7de, #f0d58a 70%);
+  box-shadow:0 0 80px 20px rgba(240,213,138,.25);
+  pointer-events:none;
+}
+body::after{
+  content:""; position:fixed; left:0; right:0; bottom:0; height:22vh; pointer-events:none;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 2px, transparent 2px 14px);
+  mask-image:linear-gradient(180deg,transparent,#000);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000);
+}
+.app{position:relative; z-index:1; max-width:980px; margin:0 auto; padding:28px 18px 40px}
+
+header h1{
+  font-family:Fraunces,Georgia,serif; font-weight:800; font-size:clamp(2.4rem,7vw,4.2rem);
+  margin:0; letter-spacing:-.02em; line-height:1;
+}
+.tag{max-width:52ch; color:var(--muted); font-size:1.05rem; line-height:1.5; margin:.6rem 0 0}
+
+.bar{
+  display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center;
+  margin:26px 0 8px; padding:14px 16px; border-radius:var(--radius);
+  background:rgba(243,233,210,.07); border:1px solid rgba(243,233,210,.14);
+}
+.stats{display:flex; gap:22px; margin:0; flex-wrap:wrap}
+.stats div{min-width:64px}
+.stats dt{font-size:.78rem; color:var(--muted)}
+.stats dd{margin:2px 0 0; font-family:Fraunces,serif; font-weight:600; font-size:1.7rem; font-variant-numeric:tabular-nums}
+
+.controls{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.pick{display:flex; align-items:center; gap:6px; color:var(--muted); font-size:.9rem}
+select,button{
+  font:inherit; font-weight:700; color:var(--paper); background:var(--ink-2);
+  border:1px solid rgba(243,233,210,.25); border-radius:10px; padding:9px 14px; cursor:pointer;
+}
+button:hover,select:hover{border-color:var(--gold)}
+button:disabled{opacity:.45; cursor:not-allowed}
+.primary{background:var(--gold); color:#2a1d05; border-color:var(--gold)}
+.primary:hover{filter:brightness(1.07)}
+:focus-visible{outline:3px solid var(--gold); outline-offset:3px}
+
+/* board */
+.board{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(6px,2vw,28px); margin-top:34px; padding-bottom:30px}
+.tower{
+  position:relative; height:340px; display:flex; align-items:flex-end; justify-content:center;
+  cursor:pointer; border-radius:var(--radius); -webkit-tap-highlight-color:transparent;
+  transition:background .2s, box-shadow .2s;
+}
+.tower:hover{background:rgba(243,233,210,.04)}
+.tower.armed{background:rgba(233,196,106,.1); box-shadow:0 0 0 2px rgba(233,196,106,.55), 0 0 40px rgba(233,196,106,.25)}
+.tower.goal::before{
+  content:""; position:absolute; inset:auto 12% 0 12%; height:300px; border-radius:50% 50% 0 0 / 14% 14% 0 0;
+  background:radial-gradient(ellipse at 50% 100%, rgba(46,156,127,.28), transparent 70%); pointer-events:none;
+}
+.tower.shake{animation:shake .35s}
+.rod{
+  position:absolute; bottom:0; left:50%; width:14px; height:300px; transform:translateX(-50%);
+  border-radius:7px 7px 0 0; background:linear-gradient(90deg,#8a6320,#f0cf86 45%,#9a6f2c);
+}
+.base{
+  position:absolute; bottom:-14px; left:2%; right:2%; height:16px; border-radius:8px;
+  background:linear-gradient(180deg,#f0cf86,#9a6f2c); box-shadow:0 6px 14px rgba(0,0,0,.4);
+}
+.name{position:absolute; bottom:-46px; left:0; right:0; text-align:center; color:var(--muted); font-weight:700}
+kbd{font:inherit; font-size:.75rem; padding:1px 6px; border-radius:6px; border:1px solid rgba(243,233,210,.3); margin-left:4px}
+
+.stack{position:relative; z-index:2; width:100%; display:flex; flex-direction:column-reverse; align-items:center}
+.disk{
+  width:var(--w); height:28px; margin-top:2px; border-radius:14px; position:relative;
+  display:grid; place-items:center; color:rgba(0,0,0,.55); font-weight:800; font-size:.8rem;
+  background:linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,0) 50%), var(--c);
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,.2), 0 3px 8px rgba(0,0,0,.4);
+}
+.disk.lift{animation:rise .25s ease-out forwards; box-shadow:inset 0 -4px 0 rgba(0,0,0,.2), 0 0 26px var(--c)}
+.disk.drop{animation:drop .22s ease-in}
+@keyframes rise{to{transform:translateY(calc(var(--lift) * -1))}}
+@keyframes drop{from{transform:translateY(-80px)}to{transform:none}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+#msg{min-height:1.6em; margin:18px 0 0; text-align:center; color:var(--paper)}
+#msg.bad{color:#ff9f93}
+footer{display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center; margin-top:18px; color:var(--muted); font-size:.9rem}
+.pill{padding:5px 12px; border-radius:999px; border:1px solid rgba(243,233,210,.25)}
+.pill.on{border-color:var(--jade); color:#8fe0c4}
+.pill.off{border-color:var(--coral); color:#ffb1a8}
+
+/* win dialog */
+dialog{border:none; border-radius:22px; padding:28px 30px; max-width:420px; text-align:center; color:#2a1d05;
+  background:var(--paper); box-shadow:0 30px 80px rgba(0,0,0,.6)}
+dialog::backdrop{background:rgba(5,15,22,.7)}
+dialog h2{font-family:Fraunces,serif; font-size:2rem; margin:0 0 8px}
+dialog p{margin:6px 0}
+.stars{font-size:2.2rem; color:#c98f1a; letter-spacing:6px}
+dialog .primary{margin-top:10px; background:var(--ink); color:var(--paper); border-color:var(--ink)}
+
+/* lotus petals instead of generic confetti */
+#petals{position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden}
+.petal{position:absolute; top:-30px; width:14px; height:22px; border-radius:50% 0 50% 50%; opacity:.9;
+  animation:fall var(--d) linear forwards}
+@keyframes fall{to{transform:translate(var(--x),110vh) rotate(var(--r))}}
+
+@media (max-width:640px){
+  .tower{height:300px} .rod{height:260px}
+  .moon{width:70px;height:70px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important}
+}
